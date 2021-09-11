@@ -3,7 +3,9 @@
 	Parser Class: this class verifies the source file syntax according to the grammar
 **/
 import java.util.*;
+import java.util.concurrent.locks.Condition;
 import java.lang.*;
+import java.beans.Expression;
 import java.io.*;
 
 public class Parser{
@@ -154,7 +156,7 @@ public class Parser{
 			recognize(Lexer.VARIABLE);
 			System.out.println("Print ok!");
 			r=true;
-		} //checks for call <variable> <lparen> [argumentList] <rparen>
+		} //checks for call <variable> <lparen> [argumentList] <rparen>|<assign>|<if statement>|<while>
 		else if (lexer.getCurrentToken().code == Lexer.CALL){
 			//checks for "call"
 			recognize(Lexer.CALL);
@@ -168,7 +170,25 @@ public class Parser{
 			//checks for <rparen>
 			recognize(Lexer.RPAREN);
 			System.out.println("call function ok!");
+			//verifies if there is an argument list 
 			r=true;			
+		}
+		else if (lexer.getCurrentToken().code==Lexer.ASSIGN){
+			assign();
+			System.out.println("call function ok!");
+			r=true;
+		}
+		else if (lexer.getCurrentToken().code==Lexer.IF){
+			ifstatement();
+			recognize(Lexer.ENDIF);
+			System.out.println("call function ok!");
+			r = true;
+		}
+		else if (lexer.getCurrentToken().code==Lexer.WHILE){
+			While();
+			recognize(Lexer.ENDWHILE);
+			System.out.println("call function ok!");
+			r = true;
 		}
 		return r;
 	}
@@ -190,7 +210,74 @@ public class Parser{
 	public void argumentDef(){
 		recognize(Lexer.VARIABLE);
 	}
+
+	/**
+		Function Expresion
+	*/
+	public void expresion(){
+		term();
+	}
+
+	/**
+		Function Term
+	*/
+	public void term(){
+		factor();
+	}
 	
+	/**
+		Function <factor>
+	 */
+	public void factor(){
+		expresion();
+		recognize(Lexer.VARIABLE);
+		recognize(Lexer.CONSTANT);
+	} 
+	/**
+		Function <condition>;
+	 */
+	public void condition(){
+		expresion();
+		if(lexer.getCurrentToken().code == Lexer.EQUALS||lexer.getCurrentToken().code == Lexer.DEQUALS){
+			expresion();
+		}
+		
+	}
+	
+	/**
+		Funcition <if statement>
+	 */
+	public void ifstatement(){
+		recognize(Lexer.IF);
+		recognize(Lexer.LPAREN);
+		condition();
+		recognize(Lexer.RPAREN);
+		statementList();
+		recognize(Lexer.ENDIF);
+		recognize(Lexer.ELSE);
+		statementList();
+		}
+
+	/**
+		Function <while>
+	 */
+	public void While(){
+		recognize(Lexer.WHILE);
+		recognize(Lexer.LPAREN);
+		condition();
+		recognize(Lexer.LPAREN);
+		statementList();
+		recognize(Lexer.ENDWHILE);
+	}
+
+	/**
+		Function <assign>
+	*/
+	public void assign(){
+		recognize(Lexer.VARIABLE);
+		recognize(Lexer.ASSIGN);
+		expresion();
+	}
 	/**
 		Function recognizeVariable: verifies for variables
 	
