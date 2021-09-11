@@ -29,8 +29,15 @@ public class Lexer{
 	public static final int PRINT = 16;
 	public static final int CALL = 17;
 	public static final int WHILE = 18;
+	public static final int DEQUALS = 19;
+	public static final int ADD = 20;
+	public static final int MULT = 21;
 	public static final int INVALIDTOKEN=98;
 	public static final int EOF = 99;
+
+
+
+
 
 	//fileScanner: (Scanner) to iterate over the source file
 	private Scanner fileScanner;
@@ -72,18 +79,25 @@ public class Lexer{
 		keywordsTable.add(new Token(ENDPROGRAM, "endprogram", 0));
 		keywordsTable.add(new Token(DEF, "def", 0));
 		keywordsTable.add(new Token(ENDDEF, "enddef", 0));
-		keywordsTable.add(new Token(IF, "if", 0));
-		keywordsTable.add(new Token(ELSE, "else", 0));
+		keywordsTable.add(new Token(IF, "if", 0));//MODIFICADO POR ESTUDIANTES
+		keywordsTable.add(new Token(ELSE, "else", 0));//MODIFICADO POR ESTUDIANTES
 		keywordsTable.add(new Token(ENDIF, "endif", 0));
-		keywordsTable.add(new Token(EQUALS, "==", 0));
+		keywordsTable.add(new Token(VARIABLE, "var", 0));//MODIFICADO POR ESTUDIANTES
+		keywordsTable.add(new Token(CONSTANT, "cons", 0));//MODIFICADO POR ESTUDIANTES
+		keywordsTable.add(new Token(EQUALS, "::", 0));//MODIFICADO POR ESTUDIANTES
+		keywordsTable.add(new Token(DEQUALS,"!:",0));//MODIFICADO POR ESTUDIANTES
+		keywordsTable.add(new Token(ASSIGN, ":", 0));//MODIFICADO POR ESTUDIANTES
 		keywordsTable.add(new Token(LPAREN, "(", 0));
 		keywordsTable.add(new Token(RPAREN, ")", 0));
 		keywordsTable.add(new Token(INT, "int", 0));
 		keywordsTable.add(new Token(READ, "read", 0));
 		keywordsTable.add(new Token(PRINT, "print", 0));
 		keywordsTable.add(new Token(CALL, "call", 0));
+		keywordsTable.add(new Token(WHILE,"while", 0));//MODIFICADO POR ESTUDIANTES
+		keywordsTable.add(new Token(ADD, "+", 0));//MODIFICADO POR ESTUDIANTES
+		keywordsTable.add(new Token(MULT, "*",0));//MODIFICADO POR ESTUDIANTES
+		keywordsTable.add(new Token(INVALIDTOKEN,"$",0));//MODIFICADO POR ESTUDIANTES
 		keywordsTable.add(new Token(EOF, "EOF", 0));
-		keywordsTable.add(new Token(WHILE,"while",0));
 		
 		
 		/** extract each token from the source file **/
