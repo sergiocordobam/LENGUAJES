@@ -2,10 +2,6 @@
 	By: Carmen Carvajal
 	Parser Class: this class verifies the source file syntax according to the grammar
 **/
-import java.util.*;
-import java.util.concurrent.locks.Condition;
-import java.lang.*;
-import java.beans.Expression;
 import java.io.*;
 
 public class Parser{
@@ -174,20 +170,19 @@ public class Parser{
 			r=true;			
 		}
 		else if (lexer.getCurrentToken().code==Lexer.ASSIGN){
-			assign();
-			System.out.println("call function ok!");
+			assign();			// error
+			System.out.println("assign function ok!");
 			r=true;
 		}
 		else if (lexer.getCurrentToken().code==Lexer.IF){
-			ifstatement();
-			recognize(Lexer.ENDIF);
-			System.out.println("call function ok!");
+			ifStatement();
+			System.out.println("if function ok!");
 			r = true;
 		}
 		else if (lexer.getCurrentToken().code==Lexer.WHILE){
 			While();
-			recognize(Lexer.ENDWHILE);
-			System.out.println("call function ok!");
+			//recognize(Lexer.ENDWHILE); error
+			System.out.println("while function ok!");
 			r = true;
 		}
 		return r;
@@ -215,47 +210,75 @@ public class Parser{
 		Function Expresion
 	*/
 	public void expresion(){
+		//recognize(Lexer.LPAREN);	// cambie esto
 		term();
+		if(lexer.getCurrentToken().code == Lexer.ADD){
+			recognize(Lexer.ADD);
+			term();
+		}
+			
+		//recognize(Lexer.RPAREN);
 	}
 
 	/**
 		Function Term
 	*/
 	public void term(){
-		factor();
+		factor();		// cambie esto
+		if (lexer.getCurrentToken().code == Lexer.MULT){
+			recognize(Lexer.MULT);
+			factor();
+		}
+			
 	}
 	
 	/**
 		Function <factor>
 	 */
 	public void factor(){
-		expresion();
-		recognize(Lexer.VARIABLE);
-		recognize(Lexer.CONSTANT);
+		if(lexer.getCurrentToken().code == Lexer.LPAREN){
+			recognize(Lexer.LPAREN);
+			expresion();
+			recognize(Lexer.RPAREN);
+		}
+		
+		
+		if (lexer.getCurrentToken().code == Lexer.VARIABLE){
+			recognize(Lexer.VARIABLE);
+		}
+		
+		else if(lexer.getCurrentToken().code == Lexer.CONSTANT){
+			recognize(Lexer.CONSTANT);
+		}
+		
 	} 
 	/**
 		Function <condition>;
 	 */
 	public void condition(){
 		expresion();
-		if(lexer.getCurrentToken().code == Lexer.EQUALS||lexer.getCurrentToken().code == Lexer.DEQUALS){
-			expresion();
+		if(lexer.getCurrentToken().code == Lexer.EQUALS){	// Cambié esto
+			recognize(Lexer.EQUALS);
+		}else if(lexer.getCurrentToken().code == Lexer.DEQUALS){
+			recognize(Lexer.DEQUALS);
 		}
-		
+		expresion();
 	}
 	
 	/**
-		Funcition <if statement>
+		Function <if statement>
 	 */
-	public void ifstatement(){
+	public void ifStatement(){
 		recognize(Lexer.IF);
 		recognize(Lexer.LPAREN);
 		condition();
 		recognize(Lexer.RPAREN);
 		statementList();
 		recognize(Lexer.ENDIF);
-		recognize(Lexer.ELSE);
-		statementList();
+		if(lexer.getCurrentToken().code == Lexer.ELSE){
+			recognize(Lexer.ELSE);
+			statementList();
+		}
 		}
 
 	/**
@@ -265,7 +288,7 @@ public class Parser{
 		recognize(Lexer.WHILE);
 		recognize(Lexer.LPAREN);
 		condition();
-		recognize(Lexer.LPAREN);
+		recognize(Lexer.RPAREN);
 		statementList();
 		recognize(Lexer.ENDWHILE);
 	}
@@ -274,16 +297,73 @@ public class Parser{
 		Function <assign>
 	*/
 	public void assign(){
-		recognize(Lexer.VARIABLE);
+		varDef();
 		recognize(Lexer.ASSIGN);
 		expresion();
 	}
+
+	/**public void add(){
+		varDefList();
+		recognize(Lexer.ADD);
+		varDefList();
+	}
+
+	public void mult(){
+		varDefList();
+		recognize(Lexer.MULT);
+		varDefList();
+	}
+	*/
+	
 	/**
 		Function recognizeVariable: verifies for variables
-	
-	**/
+	*/
 	public void recognizeVariable(){
 		recognize(Lexer.VARIABLE);
+	}
+	/**
+		Function <letter>
+	 */
+	public void letter(){
+		for (int i = 0; i < token.text.length();i++){
+			char a = token.text.charAt(i);
+			if((a >= 'a' && a <= 'z')){
+				recognize(Lexer.VARIABLE);
+			}
+		}
+	}
+
+	/**
+	Function<var>
+	 */
+	public void variable(){
+		letter();
+		/*if(lexer.getCurrentToken().code == Lexer.VARIABLE){
+			letter();
+		}
+		*/
+	}
+
+	/**
+	Function<cons>
+	 */
+	public void cons(){
+		digit();
+		/*if(lexer.getCurrentToken().code == Lexer.CONSTANT){
+			digit();
+		}
+		*/
+	}
+	/**
+	function <digit>
+	 */
+	public void digit(){
+		for (int i = 0; i < token.text.length();i++){
+			char a = token.text.charAt(i);
+			if((a >= '0' && a <= '9')){
+                recognize(Lexer.CONSTANT);
+            }
+		}
 	}
 	
 	
